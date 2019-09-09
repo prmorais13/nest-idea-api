@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { IdeaEntity } from './idea.entity';
@@ -23,16 +23,29 @@ export class IdeaService {
 	}
 
 	async getById(id: number) {
-		return await this.ideaRepository.findOne({ where: { id } });
+		const idea = await this.ideaRepository.findOne({ where: { id } });
+
+		if (!idea) {
+			throw new HttpException(
+				`Registro com ID : ${id} não encontrado!`,
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		return idea;
 	}
 
 	async update(id: number, data: Partial<IdeaDto>) {
+		const idea = this.getById(id);
 		await this.ideaRepository.update({ id }, data);
-		return await this.ideaRepository.findOne({ id });
+		// return await this.ideaRepository.findOne({ id });
+		return idea;
 	}
 
 	async delete(id: number) {
+		const idea = this.getById(id);
 		await this.ideaRepository.delete({ id });
-		return { deleted: true };
+		// return { deleted: true };
+		return idea;
 	}
 }
