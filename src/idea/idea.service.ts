@@ -36,9 +36,12 @@ export class IdeaService {
 	}
 
 	async update(id: number, data: Partial<IdeaDto>) {
-		const idea = this.getById(id);
+		let idea = this.getById(id);
+
 		await this.ideaRepository.update({ id }, data);
-		// return await this.ideaRepository.findOne({ id });
+		// .then(() => (idea = this.ideaRepository.findOne({ id })));
+		idea = this.getById(id);
+		// idea = await this.ideaRepository.findOne({ id });
 		return idea;
 	}
 
