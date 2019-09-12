@@ -26,7 +26,7 @@ export class UserService {
 				HttpStatus.BAD_REQUEST,
 			);
 		}
-		return user.toResponseObject();
+		return user.toResponseObject(true);
 	}
 
 	async register(data: UserDto): Promise<UserRO> {
@@ -38,6 +38,6 @@ export class UserService {
 
 		user = await this.userRepository.create(data);
 		await this.userRepository.save(user);
-		return user.toResponseObject();
+		return user.toResponseObject(true);
 	}
 }

@@ -32,9 +32,13 @@ export class UserEntity {
 	toResponseObject(showToken: boolean = true): UserRO {
 		const { id, created, username, token } = this;
 		const responseObject = { id, created, username, token };
+		console.log('tem token: ' + showToken);
 		if (showToken) {
 			responseObject.token = token;
+			console.log('tem token 2: ' + responseObject.token);
+			// return responseObject;
 		}
+		console.log('tem token 3: ' + responseObject.token);
 		return responseObject;
 	}
 
