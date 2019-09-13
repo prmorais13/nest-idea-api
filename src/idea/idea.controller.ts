@@ -18,7 +18,7 @@ import { User } from '../user/user.decorator';
 import { UserEntity } from '../user/user.entity';
 import { AuthGuard } from '../shared/auth.guard';
 
-@Controller('api/idea')
+@Controller('api/ideas')
 export class IdeaController {
 	constructor(private ideaService: IdeaService) {}
 

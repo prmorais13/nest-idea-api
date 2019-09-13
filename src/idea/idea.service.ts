@@ -1,9 +1,4 @@
-import {
-	Injectable,
-	HttpException,
-	HttpStatus,
-	InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { IdeaEntity } from './idea.entity';
