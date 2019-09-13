@@ -8,6 +8,7 @@ import {
 	Param,
 	UsePipes,
 	UseGuards,
+	Query,
 } from '@nestjs/common';
 
 import { IdeaService } from './idea.service';
@@ -28,8 +29,8 @@ export class IdeaController {
 	// }
 
 	@Get()
-	getAllIdeas() {
-		return this.ideaService.getAll();
+	getAllIdeas(@Query('page') page: number) {
+		return this.ideaService.getAll(page);
 	}
 
 	@Post()

@@ -42,8 +42,12 @@ export class IdeaService {
 	// 		);
 	// 	}
 	// }
-	async getAll(): Promise<IdeaRO[]> {
-		const ideas = await this.ideaRepository.find({ relations: ['author'] });
+	async getAll(page: number = 1): Promise<IdeaRO[]> {
+		const ideas = await this.ideaRepository.find({
+			relations: ['author'],
+			take: 10,
+			skip: 10 * (page - 1),
+		});
 		return ideas.map(idea => this.toResponseObject(idea));
 	}
 
