@@ -21,7 +21,7 @@ export class UserController {
 	@Get('api/users')
 	@UseGuards(AuthGuard)
 	getAllUsers(@User() user: UserEntity): Promise<UserRO[]> {
-		console.log(user);
+		/// console.log(user);
 		return this.userService.getAll();
 	}
 

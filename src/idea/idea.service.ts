@@ -1,29 +1,57 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+	Injectable,
+	HttpException,
+	HttpStatus,
+	InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { IdeaEntity } from './idea.entity';
 import { Repository } from 'typeorm';
-import { IdeaDto } from './idea.dto.interface';
+import { IdeaDto, IdeaRO } from './idea.dto.interface';
+import { UserEntity } from '../user/user.entity';
 
 @Injectable()
 export class IdeaService {
 	constructor(
 		@InjectRepository(IdeaEntity)
 		private ideaRepository: Repository<IdeaEntity>,
+
+		@InjectRepository(UserEntity)
+		private userRepository: Repository<UserEntity>,
 	) {}
 
-	async getAll() {
-		return await this.ideaRepository.find();
+	// async getAll(author: UserEntity) {
+	// 	const query = this.ideaRepository.createQueryBuilder('idea');
+	// 	query.where('authorId = :authorId', { authorId: author.id });
+	// 	const ideas = await query.getMany();
+	// 	// console.log(JSON.stringify(ideas));
+
+	// 	if (ideas.length === 0) {
+	// 		throw new HttpException(
+	// 			`Não há tarefas para os critérios informados!`,
+	// 			HttpStatus.NOT_FOUND,
+	// 		);
+	// 	}
+	// 	try {
+	// 		return ideas.map(idea => this.toResponseObject(idea));
+	// 	} catch (error) {
+	// 		throw new HttpException(
+	// 			`Erro inesperado no servidor!`,
+	// 			HttpStatus.INTERNAL_SERVER_ERROR,
+	// 		);
+	// 	}
+	// }
+	async getAll(): Promise<IdeaRO[]> {
+		const ideas = await this.ideaRepository.find({ relations: ['author'] });
+		return ideas.map(idea => this.toResponseObject(idea));
 	}
 
-	async create(data: IdeaDto) {
-		const idea = await this.ideaRepository.create(data);
-		await this.ideaRepository.save(idea);
-		return idea;
-	}
-
-	async getById(id: number) {
-		const idea = await this.ideaRepository.findOne({ where: { id } });
+	async getById(id: number): Promise<IdeaRO> {
+		const idea = await this.ideaRepository.findOne({
+			where: { id },
+			relations: ['author'],
+		});
 
 		if (!idea) {
 			throw new HttpException(
@@ -32,23 +60,71 @@ export class IdeaService {
 			);
 		}
 
-		return idea;
+		return this.toResponseObject(idea);
 	}
 
-	async update(id: number, data: Partial<IdeaDto>) {
-		let idea = this.getById(id);
+	async create(user: UserEntity, data: IdeaDto): Promise<IdeaRO> {
+		const author = await this.userRepository.findOne({
+			where: { id: user.id },
+		});
+		const idea = this.ideaRepository.create({ ...data, author });
+		await this.ideaRepository.save(idea);
+		return this.toResponseObject(idea);
+	}
+
+	async update(
+		id: number,
+		user: UserEntity,
+		data: Partial<IdeaDto>,
+	): Promise<IdeaRO> {
+		let idea = await this.ideaRepository.findOne({
+			where: { id },
+			relations: ['author'],
+		});
+
+		if (!idea) {
+			throw new HttpException(
+				`Registro com ID : ${id} não encontrado!`,
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		this.ensureOwnership(idea, user);
 
 		await this.ideaRepository.update({ id }, data);
-		// .then(() => (idea = this.ideaRepository.findOne({ id })));
-		idea = this.getById(id);
-		// idea = await this.ideaRepository.findOne({ id });
-		return idea;
+		idea = await this.ideaRepository.findOne({
+			where: { id },
+			relations: ['author'],
+		});
+		return this.toResponseObject(idea);
 	}
 
-	async delete(id: number) {
-		const idea = this.getById(id);
+	async delete(id: number, user: UserEntity) {
+		const idea = await this.ideaRepository.findOne({
+			where: { id },
+			relations: ['author'],
+		});
+
+		if (!idea) {
+			throw new HttpException(
+				`Registro com ID : ${id} não encontrado!`,
+				HttpStatus.NOT_FOUND,
+			);
+		}
+		this.ensureOwnership(idea, user);
 		await this.ideaRepository.delete({ id });
-		// return { deleted: true };
-		return idea;
+
+		return this.toResponseObject(idea);
+	}
+
+	// Metódos privados
+	private toResponseObject(idea: IdeaEntity) {
+		return { ...idea, author: idea.author.toResponseObject(false) };
+	}
+
+	private ensureOwnership(idea: IdeaEntity, user: UserEntity) {
+		if (idea.author.id !== user.id) {
+			throw new HttpException('Usuário inválido', HttpStatus.UNAUTHORIZED);
+		}
 	}
 }

@@ -1,3 +1,4 @@
+import { HttpStatus } from '@nestjs/common';
 import {
 	ArgumentsHost,
 	Catch,
@@ -19,7 +20,10 @@ export class HttpErrorFilter implements ExceptionFilter {
 			timestamp: new Date().toLocaleDateString(),
 			path: request.url,
 			method: request.method,
-			message: exception.message.error || exception.message || null,
+			message:
+				status !== HttpStatus.INTERNAL_SERVER_ERROR
+					? exception.message.error || exception.message || null
+					: 'Erro inesperado no servidor!',
 		};
 
 		Logger.error(

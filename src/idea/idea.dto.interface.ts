@@ -1,4 +1,5 @@
 import { IsString } from 'class-validator';
+import { UserRO } from '../user/user.dto';
 
 export class IdeaDto {
 	@IsString()
@@ -6,4 +7,13 @@ export class IdeaDto {
 
 	@IsString()
 	description: string;
+}
+
+export class IdeaRO {
+	id?: number;
+	created: Date;
+	updated: Date;
+	idea: string;
+	description: string;
+	author: UserRO;
 }
