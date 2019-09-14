@@ -1,8 +1,10 @@
 type User {
-	id: String!
+	id: ID!
 	username: String!
+	created: String!
+	ideas: [Idea!]
 }
 
 type Query {
-	users: [User!]
+	users(page: Int): [User!]
 }

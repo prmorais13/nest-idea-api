@@ -1,9 +1,13 @@
-import { Resolver, Query } from '@nestjs/graphql';
+import { Resolver, Query, Args } from '@nestjs/graphql';
+
+import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
+	constructor(private userService: UserService) {}
+
 	@Query()
-	users() {
-		return [{ id: 'id', username: 'username' }];
+	users(@Args('page') page: number) {
+		return this.userService.getAll(page);
 	}
 }
