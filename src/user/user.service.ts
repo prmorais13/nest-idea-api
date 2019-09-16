@@ -40,7 +40,7 @@ export class UserService {
 			throw new HttpException('Usuário já existente!', HttpStatus.BAD_REQUEST);
 		}
 
-		user = await this.userRepository.create(data);
+		user = this.userRepository.create(data);
 		await this.userRepository.save(user);
 		return user.toResponseObject(true);
 	}
