@@ -5,6 +5,7 @@ import {
 	Body,
 	UsePipes,
 	UseGuards,
+	Param,
 } from '@nestjs/common';
 
 import { UserService } from './user.service';
@@ -25,6 +26,13 @@ export class UserController {
 		return this.userService.getAll();
 	}
 
+	@Get('api/users/:username')
+	@UseGuards(AuthGuard)
+	getById(@Param() username: string): Promise<UserRO> {
+		return this.userService.getId(username);
+	}
+
+	@Get('api/users')
 	@Post('login')
 	@UsePipes(ValidationPipe)
 	login(@Body() data: UserDto): Promise<UserRO> {

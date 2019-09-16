@@ -12,6 +12,16 @@ export class UserResolver {
 		return this.userService.getAll(page);
 	}
 
+	@Query()
+	user(@Args() username: string) {
+		return this.userService.getId(username);
+	}
+
+	@Query()
+	whoami() {
+		return;
+	}
+
 	@Mutation()
 	login(@Args() username: string, password: string) {
 		const user: UserDto = { username, password };
