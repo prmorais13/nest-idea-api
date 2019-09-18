@@ -23,14 +23,12 @@ export class UserResolver {
 	}
 
 	@Mutation()
-	login(@Args() username: string, password: string) {
-		const user: UserDto = { username, password };
+	login(@Args() user: UserDto) {
 		return this.userService.login(user);
 	}
 
 	@Mutation()
-	register(@Args() { username, password }) {
-		const user: UserDto = { username, password };
+	register(@Args() user: UserDto) {
 		return this.userService.register(user);
 	}
 }
