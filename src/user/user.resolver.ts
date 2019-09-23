@@ -13,8 +13,8 @@ export class UserResolver {
 	}
 
 	@Query()
-	user(@Args() username: string) {
-		return this.userService.getId(username);
+	user(@Args('username') username: string) {
+		return this.userService.getUsername(username);
 	}
 
 	@Query()

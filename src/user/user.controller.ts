@@ -28,11 +28,10 @@ export class UserController {
 
 	@Get('api/users/:username')
 	@UseGuards(AuthGuard)
-	getById(@Param() username: string): Promise<UserRO> {
-		return this.userService.getId(username);
+	getByUsername(@Param('username') username: string): Promise<UserRO> {
+		return this.userService.getUsername(username);
 	}
 
-	@Get('api/users')
 	@Post('login')
 	@UsePipes(ValidationPipe)
 	login(@Body() data: UserDto): Promise<UserRO> {

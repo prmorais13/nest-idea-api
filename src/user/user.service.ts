@@ -21,7 +21,7 @@ export class UserService {
 		return users.map(user => user.toResponseObject(false));
 	}
 
-	async getId(username: string) {
+	async getUsername(username: string): Promise<UserRO> {
 		const user = await this.userRepository.findOne({
 			where: { username },
 			relations: ['ideas'],
